@@ -43,11 +43,11 @@ class Pagerfanta implements PagerfantaInterface
      *
      * @api
      */
-    public function __construct(AdapterInterface $adapter)
+    public function __construct(AdapterInterface $adapter, $maxPerPage = 10, $currentPage = 1)
     {
         $this->adapter = $adapter;
-        $this->maxPerPage = 10;
-        $this->currentPage = 1;
+        $this->maxPerPage = $maxPerPage;
+        $this->currentPage = $currentPage;
     }
 
     /**
@@ -262,5 +262,39 @@ class Pagerfanta implements PagerfantaInterface
         }
 
         return new \ArrayIterator($currentPageResults);
+    }
+    
+    /**
+     * Get the index of the first element in the page
+     * Returns 1 on the first page, $maxPerPage +1 on the second page, etc
+     *
+     * @return int
+     */
+    public function getFirstIndex()
+    {
+        if ($this->currentPage == 0) {
+            return 1;
+        } else {
+            return ($this->currentPage - 1) * $this->maxPerPage + 1;
+        }
+    }
+
+    /**
+     * Get the index of the last element in the page
+     * Always less than or eaqual to $maxPerPage
+     *
+     * @return int
+     */
+    public function getLastIndex()
+    {
+        if ($this->currentPage == 0) {
+            return $this->nbResults;
+        } else {
+            if (($this->currentPage * $this->maxPerPage) >= $this->nbResults) {
+                return $this->nbResults;
+            } else {
+                return ($this->currentPage * $this->maxPerPage);
+            }
+        }
     }
 }
